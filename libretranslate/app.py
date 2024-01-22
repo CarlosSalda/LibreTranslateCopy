@@ -1,4 +1,5 @@
 import io
+from dotenv import load_dotenv
 import os
 import re
 import tempfile
@@ -7,6 +8,7 @@ from datetime import datetime
 from functools import wraps
 from html import unescape
 from timeit import default_timer
+load_dotenv()
 
 import argostranslatefiles
 from argostranslatefiles import get_supported_formats
@@ -537,6 +539,12 @@ def create_app(args):
                   type: string
                   description: Error message
         """
+        if request.is_json:
+            jsonBis = get_json_dict(request)
+            api_key= jsonBis.get("api_key")
+        test = os.environ.get("API_KEY")
+        if api_key is None or  api_key != test:
+          abort(403, description=_("Invalid request: missing API key"))
         if request.is_json:
             json = get_json_dict(request)
             q = json.get("q")
